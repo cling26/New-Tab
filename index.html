@@ -12,6 +12,7 @@
   --bg-2: #111827;
   --border: #1f2937;
   --text: #e5e7eb;
+  --muted: #9ca3af;
   --accent: #38bdf8;
 }
 
@@ -25,85 +26,94 @@ body {
   overflow: hidden;
 }
 
+/* ===== NAV ===== */
 nav {
   position: fixed;
-  top: 0; left: 0; right: 0;
+  inset: 0 0 auto 0;
   height: var(--nav-height);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 16px;
+  gap: 14px;
+  padding: 0 18px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   z-index: 1000;
 }
 
+/* ===== TITLE ===== */
 .title {
-  font-size: 20px;
   font-weight: 800;
+  font-size: 20px;
   position: relative;
+  padding-bottom: 4px;
 }
 
 .title::after {
   content: "";
   position: absolute;
   left: 0;
-  bottom: -6px;
+  bottom: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, var(--accent), transparent);
+  background: var(--accent);
+  border-radius: 2px;
 }
 
+/* ===== TABS ===== */
 .tabs {
   display: flex;
   gap: 6px;
   flex: 1;
+  align-items: center;
 }
 
-/* === TAB HOVER EFFECT === */
 .tab {
   position: relative;
   padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
   cursor: pointer;
-  border: 1px solid transparent;
-  white-space: nowrap;
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    box-shadow 0.18s ease;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  transition: background .15s, transform .15s;
 }
 
 .tab::after {
   content: "";
   position: absolute;
-  left: 10%;
+  left: 50%;
   bottom: 2px;
   width: 0%;
   height: 2px;
   background: var(--accent);
-  border-radius: 2px;
-  transition: width 0.25s ease;
+  transform: translateX(-50%);
+  transition: width .25s ease;
 }
+
+.tab:hover::after { width: 100%; }
 
 .tab:hover {
   background: var(--bg-2);
   transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(56,189,248,0.25);
-}
-
-.tab:hover::after {
-  width: 80%;
 }
 
 .tab.active {
-  border-color: var(--accent);
-  color: var(--accent);
+  background: rgba(56,189,248,.12);
+  box-shadow: inset 0 0 0 1px var(--accent);
   font-weight: 600;
 }
 
-/* === DROPDOWN === */
+.star {
+  cursor: pointer;
+  opacity: .5;
+}
+
+.star.pinned {
+  color: gold;
+  opacity: 1;
+}
+
+/* ===== MORE ===== */
 .more {
   position: relative;
 }
@@ -114,7 +124,9 @@ nav {
   cursor: pointer;
 }
 
-.more-btn:hover { background: var(--bg-2); }
+.more-btn:hover {
+  background: var(--bg-2);
+}
 
 .more-menu {
   position: absolute;
@@ -123,32 +135,39 @@ nav {
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: 10px;
-  min-width: 200px;
   padding: 6px;
+  min-width: 220px;
   display: none;
-  z-index: 2000;
 }
 
-.more-menu .tab {
+.more.open .more-menu {
   display: block;
-  width: 100%;
-  margin-bottom: 4px;
 }
 
-.more.open .more-menu { display: block; }
-
-button {
-  background: none;
-  color: var(--text);
-  border: 1px solid var(--border);
-  padding: 6px 10px;
+/* ===== FULLSCREEN BUTTON ===== */
+.fullscreen-btn {
+  padding: 6px;
   border-radius: 6px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
 }
 
-button:hover { background: var(--bg-2); }
+.fullscreen-btn:hover {
+  background: var(--bg-2);
+}
 
-iframe {
+.fullscreen-icon {
+  width: 20px;
+  height: 20px;
+  fill: var(--text);
+}
+
+/* ===== IFRAME ===== */
+#viewer {
   position: fixed;
   top: var(--nav-height);
   left: 0;
@@ -156,32 +175,6 @@ iframe {
   height: calc(100% - var(--nav-height));
   border: none;
   background: black;
-}
-
-/* === SPLASH === */
-#splash {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(15,23,42,0.78);
-  backdrop-filter: blur(8px);
-  font-size: 42px;
-  font-weight: 900;
-  color: var(--accent);
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.92);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s ease;
-  z-index: 3000;
-}
-
-#splash.show {
-  opacity: 1;
-  transform: scale(1);
 }
 </style>
 </head>
@@ -192,17 +185,19 @@ iframe {
   <div class="title">New Tab 2</div>
   <div class="tabs" id="tabs"></div>
 
-  <div class="more" id="moreWrap">
-    <div class="more-btn">More ▾</div>
-    <div class="more-menu" id="moreMenu"></div>
+  <div class="fullscreen-btn" id="fsBtn">
+    <svg class="fullscreen-icon" viewBox="0 0 24 24">
+      <path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zm6 10v6h-6v-2h4v-4h2zm-16 6v-6h2v4h4v2H4z"/>
+    </svg>
   </div>
 
-  <button id="fullscreenBtn">⛶</button>
+  <div class="more" id="moreWrap">
+    <div class="more-btn" id="moreBtn"></div>
+    <div class="more-menu" id="moreMenu"></div>
+  </div>
 </nav>
 
 <iframe id="viewer"></iframe>
-
-<div id="splash">cling22.github.io/New-Tab</div>
 
 <script>
 const pages = {
@@ -222,40 +217,74 @@ const pages = {
 const MAX_VISIBLE = 6;
 const tabs = document.getElementById("tabs");
 const moreMenu = document.getElementById("moreMenu");
-const moreWrap = document.getElementById("moreWrap");
+const moreBtn = document.getElementById("moreBtn");
 const iframe = document.getElementById("viewer");
-const splash = document.getElementById("splash");
+const fsBtn = document.getElementById("fsBtn");
 
-function showSplash() {
-  splash.classList.add("show");
-  setTimeout(() => splash.classList.remove("show"), 4500);
+const favorites = new Set(JSON.parse(localStorage.getItem("favorites") || "[]"));
+
+function save(){
+  localStorage.setItem("favorites", JSON.stringify([...favorites]));
 }
 
-function loadPage(url, tab) {
+function loadGame(name, url){
+  iframe.src = url;
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  tab.classList.add("active");
-  showSplash();
-  iframe.src = "about:blank";
-  setTimeout(() => iframe.src = url, 120);
+  document.querySelector(`[data-game="${name}"]`)?.classList.add("active");
 }
 
-Object.entries(pages).forEach(([name, url], i) => {
-  const tab = document.createElement("div");
-  tab.className = "tab";
-  tab.textContent = name;
-  tab.onclick = () => loadPage(url, tab);
+function build(){
+  tabs.innerHTML = "";
+  moreMenu.innerHTML = "";
 
-  if (i < MAX_VISIBLE) tabs.appendChild(tab);
-  else moreMenu.appendChild(tab);
+  const sorted = Object.entries(pages).sort(([a],[b]) =>
+    (favorites.has(b) - favorites.has(a)) || a.localeCompare(b)
+  );
 
-  if (i === 0) loadPage(url, tab);
+  sorted.forEach(([name, url], i) => {
+    const tab = document.createElement("div");
+    tab.className = "tab";
+    tab.dataset.game = name;
+    tab.textContent = name;
+
+    const star = document.createElement("span");
+    star.textContent = "★";
+    star.className = "star" + (favorites.has(name) ? " pinned" : "");
+    star.onclick = e => {
+      e.stopPropagation();
+      favorites.has(name) ? favorites.delete(name) : favorites.add(name);
+      save();
+      build();
+    };
+
+    tab.appendChild(star);
+    tab.onclick = () => loadGame(name, url);
+
+    (i < MAX_VISIBLE ? tabs : moreMenu).appendChild(tab);
+  });
+
+  const overflow = Math.max(0, sorted.length - MAX_VISIBLE);
+  moreBtn.textContent = overflow ? `+${overflow} more` : "";
+}
+
+fsBtn.onclick = () => {
+  if (!document.fullscreenElement) {
+    iframe.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+};
+
+document.addEventListener("fullscreenchange", () => {
+  // optional: rotate or swap icon if you want
 });
 
-moreWrap.onclick = () => moreWrap.classList.toggle("open");
-
-document.getElementById("fullscreenBtn").onclick = () => {
-  if (iframe.requestFullscreen) iframe.requestFullscreen();
+document.getElementById("moreWrap").onclick = e => {
+  e.currentTarget.classList.toggle("open");
 };
+
+build();
+loadGame(Object.keys(pages)[0], Object.values(pages)[0]);
 </script>
 
 </body>
