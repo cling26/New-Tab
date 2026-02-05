@@ -197,7 +197,8 @@ nav {
   </div>
 </nav>
 
-<iframe id="viewer"></iframe>
+<!-- SANDBOXED IFRAME TO BLOCK POPUPS -->
+<iframe id="viewer" sandbox="allow-scripts allow-same-origin"></iframe>
 
 <script>
 const pages = {
@@ -275,9 +276,7 @@ fsBtn.onclick = () => {
   }
 };
 
-document.addEventListener("fullscreenchange", () => {
-  // optional: rotate or swap icon if you want
-});
+document.addEventListener("fullscreenchange", () => {});
 
 document.getElementById("moreWrap").onclick = e => {
   e.currentTarget.classList.toggle("open");
