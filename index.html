@@ -8,8 +8,7 @@
 <!-- Google AdSense -->
 <script async
   src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7762107676364310"
-  crossorigin="anonymous">
-</script>
+  crossorigin="anonymous"></script>
 
 <style>
 :root {
@@ -75,10 +74,6 @@ body {
   cursor: pointer;
 }
 
-.popup button:hover {
-  filter: brightness(1.05);
-}
-
 @keyframes pop {
   from { transform: scale(.92); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
@@ -130,26 +125,10 @@ nav {
   display: flex;
   gap: 6px;
   align-items: center;
-  transition: background .15s, transform .15s;
 }
-
-.tab::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 2px;
-  width: 0%;
-  height: 2px;
-  background: var(--accent);
-  transform: translateX(-50%);
-  transition: width .25s ease;
-}
-
-.tab:hover::after { width: 100%; }
 
 .tab:hover {
   background: var(--bg-2);
-  transform: translateY(-2px);
 }
 
 .tab.active {
@@ -204,19 +183,10 @@ nav {
   cursor: pointer;
   width: 36px;
   height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .fullscreen-btn:hover {
   background: var(--bg-2);
-}
-
-.fullscreen-icon {
-  width: 20px;
-  height: 20px;
-  fill: var(--text);
 }
 
 #viewer {
@@ -248,11 +218,7 @@ nav {
   <div class="title">New Tab 2</div>
   <div class="tabs" id="tabs"></div>
 
-  <div class="fullscreen-btn" id="fsBtn">
-    <svg class="fullscreen-icon" viewBox="0 0 24 24">
-      <path d="M4 4h6v2H6v4H4V4zm10 0h6v6h-2V6h-4V4zm6 10v6h-6v-2h4v-4h2zm-16 6v-6h2v4h4v2H4z"/>
-    </svg>
-  </div>
+  <div class="fullscreen-btn" id="fsBtn">⛶</div>
 
   <div class="more" id="moreWrap">
     <div class="more-btn" id="moreBtn"></div>
@@ -262,8 +228,11 @@ nav {
 
 <iframe id="viewer" sandbox="allow-scripts allow-same-origin"></iframe>
 
-<script>
+<!-- 🔹 External games list -->
+<script src="games.js"></script>
 
+<script>
+/* ===== POPUP ===== */
 const popup = document.getElementById("popup");
 const popupOk = document.getElementById("popupOk");
 
@@ -277,21 +246,6 @@ if (localStorage.getItem("popupSeen")) {
 }
 
 /* ===== SITE LOGIC ===== */
-const pages = {
-  "Polytrack": "https://t3m1n4l.github.io/polytrack/",
-  "Drive Mad": "https://cling26.github.io/drive-mad/drive-mad-new/",
-  "Smash Karts": "https://educational-moyv.github.io/smash-karts/",
-  "Geometry Dash": "https://gamehippy.github.io/geometry-dash-unblocked/",
-  "Basket Random": "https://unblocked-games-786.github.io/Basket-Random/",
-  "Rocket League 3D": "https://cling26.github.io/SmashKarts/",
-  "Slots": "https://cling26.github.io/Slot-Machine/",
-  "Retro Bowl": "https://cling26.github.io/rb/",
-  "Snow Rider": "https://jigar1234nob.github.io/snowrider3d/",
-  "Basket Bros": "https://hacker-114.github.io/basket-bros/",
-  "Color Tunnel 2": "https://cling26.github.io/ColorTunnel2/",
-  "Eggy Car": "https://cling26.github.io/EggyCar/"
-};
-
 const MAX_VISIBLE = 10;
 const tabs = document.getElementById("tabs");
 const moreMenu = document.getElementById("moreMenu");
@@ -315,7 +269,7 @@ function build() {
   tabs.innerHTML = "";
   moreMenu.innerHTML = "";
 
-  const sorted = Object.entries(pages).sort(([a],[b]) =>
+  const sorted = Object.entries(PAGES).sort(([a],[b]) =>
     (favorites.has(b) - favorites.has(a)) || a.localeCompare(b)
   );
 
@@ -346,7 +300,9 @@ function build() {
 }
 
 fsBtn.onclick = () => {
-  document.fullscreenElement ? document.exitFullscreen() : iframe.requestFullscreen();
+  document.fullscreenElement
+    ? document.exitFullscreen()
+    : iframe.requestFullscreen();
 };
 
 document.getElementById("moreWrap").onclick = e => {
@@ -354,7 +310,7 @@ document.getElementById("moreWrap").onclick = e => {
 };
 
 build();
-loadGame(Object.keys(pages)[0], Object.values(pages)[0]);
+loadGame(Object.keys(PAGES)[0], Object.values(PAGES)[0]);
 </script>
 
 </body>
